@@ -1,31 +1,16 @@
-const { expect } = require("chai");
-const { ethers, waffle } = require("hardhat");
-const { provider } = waffle;
+const deploy = async () => {
+    const [deployer] = await ethers.getSigners();
+    console.log("Deploying contract with the account: ", deployer.address);
 
-describe("Exchange", function () {
-  beforeEach(async function() {
-    const Token = await ethers.getContractFactory("ScamCoin");
-    token = await Token.deploy(1000);
-    await token.deployed();
+    const PlatziPunks = await ethers.getContractFactory("ScamCoin");
+    const deployed = await PlatziPunks.deploy(10000);
 
-    const Exchange = await ethers.getContractFactory("Exchange");
-    exchange = await Exchange.deploy(token.address);
-    await exchange.deployed();
-  });
+    console.log("Deployed at: ", deployed.address);
+}
 
-  it("Adds Liquidity", async function() {
-    await token.approve(exchange.address, 200);
-    await exchange.addLiquidity(200, { value: 100 });
-
-    expect(provider.getBalance(exchange.address).to.equal(100));
-    expect(exchange.getReserve().to.equal(200));
-
-  })
-})
-
-main()
-  .then(() => process.exit(0))
-  .catch((error) => {
-    console.error(error);
-    process.exit(1);
-  });
+deploy()
+    .then(() => process.exit(0))
+    .catch((error) => {
+        console.log(error);
+        process.exit(1);
+    });

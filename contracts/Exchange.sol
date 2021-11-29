@@ -22,12 +22,26 @@ contract Exchange {
         return ERC20(tokenAddress).balanceOf(address(this));
     }
 
-    function getPrice(uint256 inputAmount, uint256 inputReserve, uint256 outputReserve) private pure returns(uint256) {
+    function getAmount(uint256 inputAmount, uint256 inputReserve, uint256 outputReserve) private pure returns(uint256) {
+        require(inputReserve > 0 && outputReserve > 0, "Not Enough Reserves.");
         // X * Y = K
         // X = inputReserve
         // Y = outputReserve
-        // (x - xy) * ()
-        return (inputAmount);
+        // (x - xy) * (y - dy) = k
+        uint256 outputAmount = (inputAmount * outputReserve) / (inputReserve + inputAmount);
+        return (outputAmount);
+    }
+
+    function getTokenAmount (uint256 _ethSold) public view returns (uint256) {
+        require(_ethSold > 0, "dale pa");
+        uint256 tokenReserve = getReserve();
+        return getAmount(_ethSold, address(this).balance, tokenReserve);
+    }
+
+    function getEthAmount (uint256 _tokenSold) public view returns (uint256) {
+        require(_tokenSold > 0, "Not Enought Ether.");
+        uint256 tokenReserve = getReserve();
+        return getAmount(_tokenSold, tokenReserve, address(this).balance);
     }
 
 }
