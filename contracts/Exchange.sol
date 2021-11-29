@@ -44,4 +44,10 @@ contract Exchange {
         return getAmount(_tokenSold, tokenReserve, address(this).balance);
     }
 
+    function ethToTokenSwap(uint256 _minTokens) public payable {
+        uint tokenReserve = getReserve();
+        uint256 tokensBought = getAmount(msg.value, address(this).balance, tokenReserve);
+        IERC20(tokenAddress).transfer(msg.sender, tokensBought);
+    }
+
 }
