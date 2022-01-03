@@ -3,20 +3,36 @@ pragma solidity ^0.8.0;
 
 import "hardhat/console.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 
-contract Exchange {
+contract Exchange is ERC20 {
 
     address public tokenAddress;
 
-    constructor(address _token) {
+    constructor(address _token) ERC20("Exchange LP SKM-ETH", "LP") {
         // Check if the token is a ERC20 (You can check more!).
         require(_token != address(0), "Invalid Token Address");
         tokenAddress = _token;
     }
 
-    function addLiquidity(uint256 _tokenAmount) public payable {
+    function addLiquidity(uint256 _tokenAmount) 
+    public
+    payable 
+    returns (uint256) {
+        uint256 mintedTokens;
+        if(totalSupply() == 0) {
+            mintedTokens = address(this).balance;
+        } else {
+            uint ethReserve = address(this).balance - msg.value;
+            uint tokenReserve = getReserve();
+            uint256 correctTokenAmount = (msg.value * tokenReserve) / ethReserve;
+            require(_tokenAmount >= correctTokenAmount, "Not enough tokens");
+            mintedTokens = (totalSupply() * msg.value) / ethReserve;
+        }
         IERC20 token = IERC20(tokenAddress);
         token.transferFrom(msg.sender, address(this), _tokenAmount);
+        _mint(msg.sender, mintedTokens);
+        return mintedTokens;
     }
 
     function getReserve() public view returns (uint256) {

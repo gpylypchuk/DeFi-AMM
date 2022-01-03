@@ -12,7 +12,7 @@ describe("Exchange", function () {
     const Token = await ethers.getContractFactory("ScamCoin");
     token = await Token.deploy(totalSupply);
     await token.deployed();
-    
+
     const Exchange = await ethers.getContractFactory("Exchange");
     exchange = await Exchange.deploy(token.address);
     await exchange.deployed();
@@ -30,13 +30,13 @@ describe("Exchange", function () {
     await exchange.addLiquidity(amountA, { value: amountB });
     let tokenOut = await exchange.getTokenAmount(ethers.utils.parseEther("1"));
     expect(ethers.utils.formatEther(tokenOut)).to.equal("1.998001998001998001");
-  })
+  });
 
   it("Returns Correct Ether Amount", async() => {
     await token.approve(exchange.address, amountA);
     await exchange.addLiquidity(amountA, { value: amountB });
     let tokenOut = await exchange.getEthAmount(ethers.utils.parseEther("2"));
     expect(ethers.utils.formatEther(tokenOut)).to.equal("0.999000999000999");
-  })
+  });
 
 })
